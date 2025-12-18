@@ -1,5 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
+import pg from "pg";
 
 const app = express();
 const port = 3000;
@@ -11,15 +12,33 @@ let items = [
   { id: 1, title: "Buy milk" },
   { id: 2, title: "Finish homework" },
 ];
+const db = new pg.Client({
+  user:"postgres",
+  host:"localhost",
+  database:"permalist",
+  password:"1435840",
+  port:5432,
+});
+db.connect();
 
-app.get("/", (req, res) => {
+async function getItems() {
+  const result=await db.query("select * from items");
+  items=result.rows;
+  console.log(items);
+}
+
+
+
+app.get("/", async(req, res) => {
+  
+  await getItems();
   res.render("index.ejs", {
     listTitle: "Today",
     listItems: items,
   });
 });
 
-app.post("/add", (req, res) => {
+app.post ("/add", (req, res) => {
   const item = req.body.newItem;
   items.push({ title: item });
   res.redirect("/");
