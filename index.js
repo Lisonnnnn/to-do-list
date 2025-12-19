@@ -22,7 +22,7 @@ const db = new pg.Client({
 db.connect();
 
 async function getItems() {
-  const result=await db.query("select * from items");
+  const result=await db.query("select * from items order by id asc");
   items=result.rows;
   console.log(items);
 }
@@ -40,12 +40,16 @@ app.get("/", async(req, res) => {
 
 app.post ("/add", async(req, res) => {
   const item = req.body.newItem;
-  await db.query("insert into items (title) values ($1)",[item])
+  await db.query("insert into items (title) values ($1) ",[item])
   items.push({ title: item });
   res.redirect("/");
 });
 
-app.post("/edit", (req, res) => {});
+app.post("/edit", async(req, res) => {
+await db.query("update items set title=$1 where id=$2",[req.body.updatedItemTitle,req.body.updatedItemId])
+res.redirect("/");
+
+});
 
 app.post("/delete", (req, res) => {});
 
