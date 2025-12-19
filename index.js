@@ -38,8 +38,9 @@ app.get("/", async(req, res) => {
   });
 });
 
-app.post ("/add", (req, res) => {
+app.post ("/add", async(req, res) => {
   const item = req.body.newItem;
+  await db.query("insert into items (title) values ($1)",[item])
   items.push({ title: item });
   res.redirect("/");
 });
